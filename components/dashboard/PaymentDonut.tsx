@@ -19,6 +19,7 @@ export default function PaymentDonut() {
   };
 
   const options: ChartOptions<"doughnut"> = {
+    responsive: true,
     cutout: "75%",
     plugins: {
       tooltip: {
@@ -32,7 +33,7 @@ export default function PaymentDonut() {
       <h2 className="text-base font-semibold self-start">Payment</h2>
 
       <div className="relative w-32 h-32">
-        <Doughnut data={data} options={options as any} />
+        <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <p className="text-xs text-gray-400">USD</p>
