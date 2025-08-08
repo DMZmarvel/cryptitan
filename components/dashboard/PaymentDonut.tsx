@@ -1,5 +1,5 @@
 import { Doughnut } from "react-chartjs-2";
-import { Chart, ArcElement, Tooltip } from "chart.js";
+import { Chart, ArcElement, Tooltip, ChartOptions } from "chart.js";
 
 Chart.register(ArcElement, Tooltip);
 
@@ -18,7 +18,7 @@ export default function PaymentDonut() {
     ],
   };
 
-  const options = {
+  const options: ChartOptions<"doughnut"> = {
     cutout: "75%",
     plugins: {
       tooltip: {
