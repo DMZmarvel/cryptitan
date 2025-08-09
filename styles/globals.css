@@ -64,3 +64,8 @@ body {
 .animate-fade-slide {
   animation: fadeSlide 0.3s ease-in-out;
 }
+
+
+/* hide scrollbar for sidebar without breaking scroll */
+.scrollbar-thin::-webkit-scrollbar { width: 0; height: 0; }
+.scrollbar-thin { scrollbar-width: none; }

@@ -1,66 +1,88 @@
-import { useState } from "react";
+// components/dashboard/TradesTable.tsx
+import React from "react";
 
-export default function TradesTable() {
-  const [tradeType, setTradeType] = useState<"Buy" | "Sell">("Buy");
+type TradesTableProps = {
+  /** Which side to display the badge for */
+  side?: "buy" | "sell";
+  /** Optional title override */
+  title?: string;
+};
+
+export default function TradesTable({
+  side = "buy",
+  title = "Trades",
+}: TradesTableProps) {
+  const isBuy = side === "buy";
+  const counterpartyHeader = isBuy ? "Seller" : "Buyer";
 
   return (
-    <div className="bg-[#1f2937] rounded-xl shadow border border-gray-200 p-4 overflow-hidden">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-700">Trades</h3>
+    <div className="bg-[#1f2937] rounded-xl p-4 shadow-md text-white">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-semibold">{title}</h3>
         <span
-          className={`text-xs px-2 py-1 rounded-full font-medium ${
-            tradeType === "Buy"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-600"
-          }`}
+          className={[
+            "px-2 py-0.5 text-xs rounded-md font-medium",
+            isBuy ? "bg-green-700/60 text-green-100" : "bg-red-700/60 text-red-100",
+          ].join(" ")}
         >
-          {tradeType}
+          {isBuy ? "Buy" : "Sell"}
         </span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-gray-600">
-          <thead className="text-gray-400 text-xs border-b">
-            <tr>
-              <th className="py-2 pr-4 text-left">Amount</th>
-              <th className="py-2 pr-4 text-left">Coin</th>
-              <th className="py-2 pr-4 text-left">Payment</th>
-              <th className="py-2 pr-4 text-left">User</th>
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full text-sm">
+          <thead className="text-gray-300/70">
+            <tr className="text-left">
+              <th className="py-2 pr-4 font-medium">Amount</th>
+              <th className="py-2 pr-4 font-medium">Coin</th>
+              <th className="py-2 pr-4 font-medium">Payment</th>
+              <th className="py-2 pr-4 font-medium">{counterpartyHeader}</th>
             </tr>
           </thead>
           <tbody>
-            {/* Empty state (for now) */}
+            {/* Empty state */}
             <tr>
-              <td colSpan={4} className="text-center py-6 text-gray-400">
-                No trades found
+              <td
+                colSpan={4}
+                className="py-10 text-center text-gray-400 border-t border-white/5"
+              >
+                No rows
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {/* Toggle Buttons (optional for demo/testing) */}
-      <div className="flex justify-end mt-4 space-x-2">
-        <button
-          onClick={() => setTradeType("Buy")}
-          className={`text-xs px-3 py-1 rounded ${
-            tradeType === "Buy"
-              ? "bg-green-600 text-white"
-              : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Buy
-        </button>
-        <button
-          onClick={() => setTradeType("Sell")}
-          className={`text-xs px-3 py-1 rounded ${
-            tradeType === "Sell"
-              ? "bg-red-600 text-white"
-              : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Sell
-        </button>
+      {/* Faux scrollbar strip (like Cryptitan) */}
+      <div className="mt-3 h-2 rounded bg-white/10">
+        <div className="h-full w-1/2 rounded bg-white/20" />
+      </div>
+
+      {/* Footer pager */}
+      <div className="mt-2 flex items-center justify-between text-xs text-gray-300/80">
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <button className="inline-flex items-center gap-1 rounded-md bg-[#0f172a] px-2 py-1">
+            10 <span className="opacity-70">▾</span>
+          </button>
+        </div>
+        <div className="flex items-center gap-3">
+          <span>0–0 of 0</span>
+          <button
+            aria-label="Prev page"
+            className="rounded-md bg-white/10 w-6 h-6 grid place-items-center hover:bg-white/15"
+          >
+            ‹
+          </button>
+          <button
+            aria-label="Next page"
+            className="rounded-md bg-white/10 w-6 h-6 grid place-items-center hover:bg-white/15"
+          >
+            ›
+          </button>
+        </div>
       </div>
     </div>
   );

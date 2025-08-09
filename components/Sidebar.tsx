@@ -1,8 +1,7 @@
 // components/Sidebar.tsx
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
   FiHome,
   FiUser,
@@ -13,205 +12,289 @@ import {
   FiChevronUp,
 } from "react-icons/fi";
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import { BiCubeAlt } from "react-icons/bi";
+import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import SupportWidget from "./SupportWidget";
+import { getUser, initialFromNameOrEmail, StoredUser } from "@/lib/auth";
+
+type DropKeys = "commerce" | "peer" | "exchange" | "stake";
 
 export default function Sidebar() {
   const router = useRouter();
-
-  const [openDropdowns, setOpenDropdowns] = useState({
+  const [open, setOpen] = useState<Record<DropKeys, boolean>>({
     commerce: false,
     peer: false,
     exchange: false,
     stake: false,
   });
 
-  // Automatically open dropdown on active route
+  const [user, setUser] = useState<StoredUser | null>(null);
+
+  // read user + keep fresh if localStorage changes
   useEffect(() => {
-    const path = router.pathname;
-    if (path.startsWith("/main/commerce"))
-      setOpenDropdowns((prev) => ({ ...prev, commerce: true }));
-    if (path.startsWith("/main/peer"))
-      setOpenDropdowns((prev) => ({ ...prev, peer: true }));
-    if (path.startsWith("/main/exchange"))
-      setOpenDropdowns((prev) => ({ ...prev, exchange: true }));
-    if (path.startsWith("/main/stake"))
-      setOpenDropdowns((prev) => ({ ...prev, stake: true }));
+    const read = () => setUser(getUser());
+    read();
+    const onUpdate = () => read();
+    window.addEventListener("storage", onUpdate);
+    window.addEventListener("ct:user-updated", onUpdate as EventListener);
+    return () => {
+      window.removeEventListener("storage", onUpdate);
+      window.removeEventListener("ct:user-updated", onUpdate as EventListener);
+    };
+  }, []);
+
+  // auto-open correct group on route change
+  useEffect(() => {
+    const p = router.pathname;
+    setOpen((prev) => ({
+      ...prev,
+      commerce: p.startsWith("/main/commerce") || prev.commerce,
+      peer: p.startsWith("/main/peer") || prev.peer,
+      exchange: p.startsWith("/main/exchange") || prev.exchange,
+      stake: p.startsWith("/main/stake") || prev.stake,
+    }));
   }, [router.pathname]);
 
-  // Dropdown toggle
-  const toggleDropdown = (key: keyof typeof openDropdowns) => {
-    setOpenDropdowns((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const toggle = (k: DropKeys) => setOpen((s) => ({ ...s, [k]: !s[k] }));
+  const isActive = (href: string) =>
+    router.pathname === href || router.pathname.startsWith(href + "/");
 
-  // Link item
-  const MenuItem = ({ href, label }: { href: string; label: string }) => (
+  const ItemRow = ({
+    href,
+    icon: Icon,
+    label,
+  }: {
+    href: string;
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+  }) => (
     <Link
       href={href}
-      className={`block px-4 py-1.5 text-sm rounded-md transition duration-200 ${
-        router.pathname === href
-          ? "text-white bg-green-600 font-semibold"
+      className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition
+      ${
+        isActive(href)
+          ? "bg-[#0f3c2c] text-white"
           : "text-gray-300 hover:bg-gray-800"
       }`}
     >
-      • {label}
+      <Icon className="text-[18px] opacity-90" />
+      <span>{label}</span>
     </Link>
   );
 
+  const GroupRow = ({
+    label,
+    icon: Icon,
+    open,
+    onClick,
+  }: {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    open: boolean;
+    onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800"
+    >
+      <span className="flex items-center gap-3">
+        <Icon className="text-[18px] opacity-90" />
+        {label}
+      </span>
+      {open ? (
+        <FiChevronUp className="opacity-80" />
+      ) : (
+        <FiChevronDown className="opacity-80" />
+      )}
+    </button>
+  );
+
+  const BulletLink = ({
+    href,
+    children,
+  }: {
+    href: string;
+    children: string;
+  }) => (
+    <Link
+      href={href}
+      className={`block ml-6 px-4 py-1.5 text-sm rounded-md transition
+      ${
+        isActive(href)
+          ? "bg-[#0f3c2c] text-white"
+          : "text-gray-300 hover:bg-gray-800"
+      }`}
+    >
+      • {children}
+    </Link>
+  );
+
+  const displayName = user?.username || "demo";
+  const displayEmail = user?.email || "";
+  const initial = initialFromNameOrEmail(user?.username, user?.email);
+
   return (
-    <aside className="w-64 h-screen bg-[#111827] text-white flex flex-col justify-between shadow-lg lg:shadow-none">
-      {/* Top Section */}
-      <div className="p-4 space-y-2 overflow-y-auto hide-scrollbar">
-        {/* Logo + Welcome Block */}
-        <div className="flex flex-col items-center space-y-2 mb-6">
-          <Image
-            src="/assets/avatar.png"
-            alt="avatar"
-            width={48}
-            height={48}
-            className="rounded-full"
-          />
-          <div className="text-sm font-medium">Welcome, demo</div>
-          <button className="bg-green-600 text-white text-xs font-semibold px-4 py-1 rounded-full flex items-center gap-1">
-            <span className="text-white text-xs">⚙</span> Control Panel
-          </button>
+    <aside className="w-64 h-screen bg-[#111827] text-white flex flex-col justify-between shadow-lg">
+      <div className="p-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
+        {/* logo row */}
+        <div className="flex items-center justify-between px-1">
+          <div className="w-7 h-7 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full bg-emerald-400" />
+          </div>
+          <div className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-gray-300 text-xs">
+            ○
+          </div>
+        </div>
+
+        {/* welcome card (dynamic) */}
+        <div className="mt-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-3">
+            {/* letter avatar */}
+            <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold grid place-items-center">
+              {initial}
+            </div>
+            <div className="text-sm">
+              <div className="text-gray-200 truncate">
+                {user ? `Welcome, ${displayName}` : "Welcome, demo"}
+              </div>
+              {displayEmail && (
+                <div className="text-[11px] text-gray-400 truncate">
+                  {displayEmail}
+                </div>
+              )}
+              <div className="mt-2">
+                <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
+                  <span className="w-2 h-2 rounded-full bg-emerald-200" />
+                  Control Panel
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* GENERAL */}
-        <div className="space-y-1">
-          <p className="text-xs text-gray-400 font-semibold mb-1 px-2">
+        <div className="mt-4 space-y-1.5">
+          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold mb-1">
             GENERAL
           </p>
-          <Link
-            href="/main"
-            className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition ${
-              router.pathname === "/main"
-                ? "bg-green-600 text-white font-semibold"
-                : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <FiHome /> Home
-          </Link>
-          <Link
-            href="/main/profile"
-            className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition ${
-              router.pathname === "/main/profile"
-                ? "bg-green-600 text-white font-semibold"
-                : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <FiUser /> Profile
-          </Link>
-          <Link
-            href="/main/Payments"
-            className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition ${
-              router.pathname === "/main/Payments"
-                ? "bg-green-600 text-white font-semibold"
-                : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <FiCreditCard /> Payments
-          </Link>
-          <Link
-            href="/main/Wallets"
-            className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition ${
-              router.pathname === "/main/Wallets"
-                ? "bg-green-600 text-white font-semibold"
-                : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <MdAccountBalanceWallet /> Wallets
-          </Link>
-        </div>
 
-        {/* COMMERCE */}
-        <div>
-          <div
-            className="flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer"
-            onClick={() => toggleDropdown("commerce")}
-          >
-            <span className="flex items-center gap-2">
-              <BiCubeAlt /> Commerce
-            </span>
-            {openDropdowns.commerce ? <FiChevronUp /> : <FiChevronDown />}
+          <div className="space-y-1.5">
+            <ItemRow href="/main" icon={FiHome} label="Home" />
+            <ItemRow href="/main/profile" icon={FiUser} label="Profile" />
+            <ItemRow
+              href="/main/payments"
+              icon={FiCreditCard}
+              label="Payments"
+            />
+            <ItemRow
+              href="/main/wallets"
+              icon={MdAccountBalanceWallet}
+              label="Wallets"
+            />
           </div>
-          {openDropdowns.commerce && (
-            <div className="pl-6 space-y-1 transition-all duration-300 ease-in-out animate-fade-slide origin-top">
-              <MenuItem href="/main/commerce/dashboard" label="Dashboard" />
-              <MenuItem
-                href="/main/commerce/transactions"
-                label="Transactions"
-              />
-              <MenuItem href="/main/commerce/payments" label="Payments" />
-              <MenuItem href="/main/commerce/customers" label="Customers" />
-              <MenuItem href="/main/commerce/account" label="Account" />
+
+          {/* Commerce */}
+          <div className="mt-2">
+            <GroupRow
+              label="Commerce"
+              icon={BiCubeAlt}
+              open={open.commerce}
+              onClick={() => toggle("commerce")}
+            />
+            <div
+              className={`overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-out ${
+                open.commerce
+                  ? "max-h-64 opacity-100 translate-y-0"
+                  : "max-h-0 opacity-0 -translate-y-1"
+              }`}
+            >
+              <div className="space-y-1.5">
+                <BulletLink href="/main/commerce/dashboard">
+                  Dashboard
+                </BulletLink>
+                <BulletLink href="/main/commerce/transactions">
+                  Transactions
+                </BulletLink>
+                <BulletLink href="/main/commerce/payments">Payments</BulletLink>
+                <BulletLink href="/main/commerce/customers">
+                  Customers
+                </BulletLink>
+                <BulletLink href="/main/commerce/account">Account</BulletLink>
+              </div>
             </div>
-          )}
+          </div>
         </div>
 
         {/* MARKETPLACE */}
-        <div>
-          <p className="text-xs text-gray-400 font-semibold mt-6 mb-1 px-2">
+        <div className="mt-5">
+          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold mb-1">
             MARKETPLACE
           </p>
 
           {/* Peer */}
-          <div
-            className="flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer"
-            onClick={() => toggleDropdown("peer")}
-          >
-            <span className="flex items-center gap-2">
-              <FiUsers /> Peer
-            </span>
-            {openDropdowns.peer ? <FiChevronUp /> : <FiChevronDown />}
-          </div>
-          {openDropdowns.peer && (
-            <div className="pl-6 space-y-1 transition-all duration-300 ease-in-out animate-fade-slide origin-top">
-              <MenuItem href="/main/peer/buy" label="Buy Crypto" />
-              <MenuItem href="/main/peer/sell" label="Sell Crypto" />
-              <MenuItem href="/main/peer/offer" label="Create Offer" />
-              <MenuItem href="/main/peer/trades" label="Trades" />
+          <div className="mt-1">
+            <GroupRow
+              label="Peer"
+              icon={FiUsers}
+              open={open.peer}
+              onClick={() => toggle("peer")}
+            />
+            <div
+              className={`overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-out ${
+                open.peer
+                  ? "max-h-64 opacity-100 translate-y-0"
+                  : "max-h-0 opacity-0 -translate-y-1"
+              }`}
+            >
+              <BulletLink href="/main/peer/buy">Buy Crypto</BulletLink>
+              <BulletLink href="/main/peer/sell">Sell Crypto</BulletLink>
+              <BulletLink href="/main/peer/offer">Create Offer</BulletLink>
+              <BulletLink href="/main/peer/trades">Trades</BulletLink>
             </div>
-          )}
+          </div>
 
           {/* Exchange */}
-          <div
-            className="flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer"
-            onClick={() => toggleDropdown("exchange")}
-          >
-            <span className="flex items-center gap-2">
-              <FiDollarSign /> Exchange
-            </span>
-            {openDropdowns.exchange ? <FiChevronUp /> : <FiChevronDown />}
-          </div>
-          {openDropdowns.exchange && (
-            <div className="pl-6 space-y-1 transition-all duration-300 ease-in-out animate-fade-slide origin-top">
-              <MenuItem href="/main/exchange/trade" label="Trade" />
-              <MenuItem href="/main/exchange/swap" label="Swap" />
+          <div className="mt-1">
+            <GroupRow
+              label="Exchange"
+              icon={FiDollarSign}
+              open={open.exchange}
+              onClick={() => toggle("exchange")}
+            />
+            <div
+              className={`overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-out ${
+                open.exchange
+                  ? "max-h-40 opacity-100 translate-y-0"
+                  : "max-h-0 opacity-0 -translate-y-1"
+              }`}
+            >
+              <BulletLink href="/main/exchange/trade">Trade</BulletLink>
+              <BulletLink href="/main/exchange/swap">Swap</BulletLink>
             </div>
-          )}
+          </div>
 
           {/* Stake */}
-          <div
-            className="flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer"
-            onClick={() => toggleDropdown("stake")}
-          >
-            <span className="flex items-center gap-2">
-              <BsFillRocketTakeoffFill /> Stake
-            </span>
-            {openDropdowns.stake ? <FiChevronUp /> : <FiChevronDown />}
-          </div>
-          {openDropdowns.stake && (
-            <div className="pl-6 space-y-1 transition-all duration-300 ease-in-out animate-fade-slide origin-top">
-              <MenuItem href="/main/stake/plans" label="Plans" />
-              <MenuItem href="/main/stake/manage" label="Manage" />
+          <div className="mt-1">
+            <GroupRow
+              label="Stake"
+              icon={BsFillRocketTakeoffFill}
+              open={open.stake}
+              onClick={() => toggle("stake")}
+            />
+            <div
+              className={`overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-out ${
+                open.stake
+                  ? "max-h-32 opacity-100 translate-y-0"
+                  : "max-h-0 opacity-0 -translate-y-1"
+              }`}
+            >
+              <BulletLink href="/main/stake/plans">Plans</BulletLink>
+              <BulletLink href="/main/stake/manage">Manage</BulletLink>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* SUPPORT */}
       <div className="p-4">
         <SupportWidget />
       </div>
