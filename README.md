@@ -1,3 +1,17 @@
+🚀 Cryptitan-Style Dashboard Clone
+Front-end-only Next.js + Tailwind + MUI project replicating core pages of Cryptitan.
+Includes authentication flow, forgot/reset password process, mock data system, and responsive tables.
+Perfect for UI/UX prototyping and frontend practice — no backend required.
+
+
+
+📖 Overview
+This is a front-end implementation of selected Cryptitan dashboard pages, built with Next.js, Tailwind CSS, and Material UI.
+It simulates authentication, dashboard navigation, commerce/peer/exchange/stake modules, and includes a forgot/reset password flow — all without any backend API.
+
+🌍 Live Demo
+https://cryptitan-xi.vercel.app/
+
 🛠 Tech Stack
 Framework: Next.js 14+
 
