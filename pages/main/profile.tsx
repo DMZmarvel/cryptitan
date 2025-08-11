@@ -1,4 +1,5 @@
 // pages/main/profile.tsx
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import Image from "next/image";
 import { AiOutlineClockCircle } from "react-icons/ai";
@@ -11,8 +12,49 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
+import { getUser, initialFromName } from "@/lib/auth";
+
+type LiteUser = {
+  username?: string;
+  email?: string;
+  createdAt?: string;
+  avatarInitial?: string;
+};
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<LiteUser>({
+    username: "demo",
+    email: "",
+    createdAt: undefined,
+    avatarInitial: "D",
+  });
+
+  useEffect(() => {
+    const u = getUser();
+    if (u) {
+      setUser({
+        username: u.username || "user",
+        email: u.email || "",
+        createdAt: u.createdAt,
+        avatarInitial:
+          u.avatarInitial || initialFromName(u.username || u.email || "user"),
+      });
+    }
+  }, []);
+
+  const registered = user.createdAt
+    ? new Date(user.createdAt)
+    : new Date("2021-11-10");
+  const registeredLabel = registered.toLocaleString(undefined, {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+
+  const avatarInitial = (
+    user.avatarInitial || initialFromName(user.username || "user")
+  ).toUpperCase();
+
   return (
     <DashboardLayout>
       <div className="text-white space-y-6">
@@ -27,35 +69,37 @@ export default function ProfilePage() {
 
         {/* Cover / identity block */}
         <div className="relative bg-[#143b2f] rounded-xl overflow-hidden">
-          {/* Cover image tint */}
+          {/* Tint over a soft texture */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/50 pointer-events-none" />
           <Image
-            src="/assets/register-illustration.png" // just a texture; replace with a cover if you like
+            src="/assets/register-illustration.png"
             alt="cover"
             fill
-            className="object-cover opacity-35"
+            className="object-cover opacity-30"
             priority
           />
-          {/* avatar + name */}
+
           <div className="relative px-5 pt-6 pb-4">
             <div className="flex items-center gap-4">
+              {/* Letter avatar to match logged-in user */}
               <div className="relative">
-                <Image
-                  src="/assets/avatar.png"
-                  alt="avatar"
-                  width={72}
-                  height={72}
-                  className="rounded-full ring-4 ring-black/40"
-                />
+                <div className="w-[72px] h-[72px] rounded-full bg-emerald-600 grid place-items-center text-white text-2xl font-semibold ring-4 ring-black/40">
+                  {avatarInitial}
+                </div>
                 <span className="absolute -right-1 -bottom-1 w-3.5 h-3.5 rounded-full bg-green-500 ring-2 ring-[#0f172a]" />
               </div>
+
               <div>
-                <div className="text-lg font-semibold">demo</div>
-                <div className="text-gray-300 text-sm">Dee Deeee</div>
+                <div className="text-lg font-semibold">
+                  {user.username || "user"}
+                </div>
+                <div className="text-gray-300 text-sm truncate max-w-[60vw] md:max-w-none">
+                  {user.email || "—"}
+                </div>
               </div>
             </div>
 
-            {/* Tabs */}
+            {/* Tabs (visual only) */}
             <div className="mt-4 flex items-center gap-4 text-sm">
               <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 text-white border border-white/10">
                 <FiLock className="opacity-80" />
@@ -98,7 +142,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <BsCalendar3 />
-                Registered Nov 10, 2021
+                Registered {registeredLabel}
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <FiMapPin />

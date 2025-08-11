@@ -7,7 +7,6 @@ export default function RecentTransactions() {
         <h2 className="text-base font-semibold">Recent Transactions</h2>
       </div>
 
-      {/* Table Header */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left">
           <thead>
@@ -29,7 +28,6 @@ export default function RecentTransactions() {
         </table>
       </div>
 
-      {/* Footer Pagination */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-400 px-2">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>

@@ -1,4 +1,3 @@
-// components/CaptchaModal.tsx
 import { useEffect, useMemo, useState } from "react";
 
 type Props = {
@@ -11,7 +10,6 @@ export default function CaptchaModal({ open, onClose, onSuccess }: Props) {
   const [leftOk, setLeftOk] = useState(false);
   const [rightOk, setRightOk] = useState(false);
 
-  // reset each time it opens
   useEffect(() => {
     if (open) {
       setLeftOk(false);
@@ -28,12 +26,10 @@ export default function CaptchaModal({ open, onClose, onSuccess }: Props) {
           Please drag the pieces to complete the puzzle
         </h3>
 
-        {/* Puzzle board */}
         <div
           className="relative bg-[url('/assets/puzzle-bg.png')] bg-cover bg-center rounded-md border overflow-hidden mx-auto"
           style={{ width: 640, height: 320, maxWidth: "100%" }}
         >
-          {/* Drop targets */}
           <div
             id="target-left"
             className={`absolute top-[58%] left-[36%] -translate-x-1/2 -translate-y-1/2 h-20 w-16 rounded-md border-2
@@ -57,7 +53,6 @@ export default function CaptchaModal({ open, onClose, onSuccess }: Props) {
             }}
           />
 
-          {/* Draggable pieces */}
           <button
             draggable
             onDragStart={(e) =>

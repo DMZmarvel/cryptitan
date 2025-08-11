@@ -1,4 +1,3 @@
-// components/Topbar.tsx
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,11 +19,13 @@ export default function Topbar() {
   useEffect(() => {
     const read = () => setUser(getUser());
     read();
+
     const onDoc = (e: MouseEvent) => {
       if (!menuRef.current) return;
       if (!menuRef.current.contains(e.target as Node)) setOpen(false);
     };
     const onUpdate = () => read();
+
     document.addEventListener("mousedown", onDoc);
     window.addEventListener("storage", onUpdate);
     window.addEventListener("ct:user-updated", onUpdate as EventListener);
@@ -45,7 +46,7 @@ export default function Topbar() {
   };
 
   return (
-    <div className="w-full h-16 px-4 flex items-center justify-end border-b border-white/10 backdrop-blur-md bg-white/10">
+    <div className="w-full h-16 px-4 flex items-center justify-end border-b border-white/10 backdrop-blur-md bg-white/10 relative overflow-visible">
       <div className="flex items-center space-x-6">
         <div className="flex items-center space-x-1 cursor-pointer">
           <Image
@@ -64,7 +65,6 @@ export default function Topbar() {
           </span>
         </div>
 
-        {/* User button + menu */}
         <div ref={menuRef} className="relative">
           <button
             onClick={() => setOpen((v) => !v)}
@@ -75,7 +75,13 @@ export default function Topbar() {
           </button>
 
           {open && (
-            <div className="absolute right-0 mt-2 w-56 rounded-lg bg-[#1f2937] text-white shadow-lg border border-white/10 overflow-hidden z-50">
+            <div
+              className="
+                absolute right-0 top-full mt-2 w-56 rounded-lg
+                bg-[#161b23] text-white shadow-2xl border border-white/10
+                overflow-hidden z-[1000]
+              "
+            >
               <div className="px-4 py-3 border-b border-white/10">
                 <div className="text-sm font-semibold truncate">{name}</div>
                 {email && (

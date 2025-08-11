@@ -1,4 +1,3 @@
-// components/SupportWidget.tsx
 import { FiMessageSquare } from "react-icons/fi";
 
 export default function SupportWidget() {

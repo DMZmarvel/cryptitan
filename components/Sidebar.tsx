@@ -1,4 +1,3 @@
-// components/Sidebar.tsx
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -30,7 +29,6 @@ export default function Sidebar() {
 
   const [user, setUser] = useState<StoredUser | null>(null);
 
-  // read user + keep fresh if localStorage changes
   useEffect(() => {
     const read = () => setUser(getUser());
     read();
@@ -43,7 +41,6 @@ export default function Sidebar() {
     };
   }, []);
 
-  // auto-open correct group on route change
   useEffect(() => {
     const p = router.pathname;
     setOpen((prev) => ({
@@ -136,7 +133,6 @@ export default function Sidebar() {
   return (
     <aside className="w-64 h-screen bg-[#111827] text-white flex flex-col justify-between shadow-lg">
       <div className="p-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-transparent">
-        {/* logo row */}
         <div className="flex items-center justify-between px-1">
           <div className="w-7 h-7 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
             <div className="w-3 h-3 rounded-full bg-emerald-400" />
@@ -146,10 +142,8 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* welcome card (dynamic) */}
         <div className="mt-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
           <div className="flex items-center gap-3">
-            {/* letter avatar */}
             <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold grid place-items-center">
               {initial}
             </div>
@@ -172,13 +166,12 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* GENERAL */}
-        <div className="mt-4 space-y-1.5">
-          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold mb-1">
+        <div className="mt-4 space-y-2">
+          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold">
             GENERAL
           </p>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <ItemRow href="/main" icon={FiHome} label="Home" />
             <ItemRow href="/main/profile" icon={FiUser} label="Profile" />
             <ItemRow
@@ -193,8 +186,7 @@ export default function Sidebar() {
             />
           </div>
 
-          {/* Commerce */}
-          <div className="mt-2">
+          <div className="pt-2 space-y-2">
             <GroupRow
               label="Commerce"
               icon={BiCubeAlt}
@@ -208,7 +200,7 @@ export default function Sidebar() {
                   : "max-h-0 opacity-0 -translate-y-1"
               }`}
             >
-              <div className="space-y-1.5">
+              <div className="space-y-2 pl-0">
                 <BulletLink href="/main/commerce/dashboard">
                   Dashboard
                 </BulletLink>
@@ -219,20 +211,18 @@ export default function Sidebar() {
                 <BulletLink href="/main/commerce/customers">
                   Customers
                 </BulletLink>
-                <BulletLink href="/main/commerce/account">Account</BulletLink>
+                <BulletLink href="/main/commerce/accounts">Account</BulletLink>
               </div>
             </div>
           </div>
         </div>
 
-        {/* MARKETPLACE */}
-        <div className="mt-5">
-          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold mb-1">
+        <div className="mt-6 space-y-2">
+          <p className="px-2 text-[11px] tracking-wide text-gray-400 font-semibold">
             MARKETPLACE
           </p>
 
-          {/* Peer */}
-          <div className="mt-1">
+          <div className="space-y-2">
             <GroupRow
               label="Peer"
               icon={FiUsers}
@@ -246,15 +236,16 @@ export default function Sidebar() {
                   : "max-h-0 opacity-0 -translate-y-1"
               }`}
             >
-              <BulletLink href="/main/peer/buy">Buy Crypto</BulletLink>
-              <BulletLink href="/main/peer/sell">Sell Crypto</BulletLink>
-              <BulletLink href="/main/peer/offer">Create Offer</BulletLink>
-              <BulletLink href="/main/peer/trades">Trades</BulletLink>
+              <div className="space-y-2">
+                <BulletLink href="/main/peer/buy">Buy Crypto</BulletLink>
+                <BulletLink href="/main/peer/sell">Sell Crypto</BulletLink>
+                <BulletLink href="/main/peer/offer">Create Offer</BulletLink>
+                <BulletLink href="/main/peer/trades">Trades</BulletLink>
+              </div>
             </div>
           </div>
 
-          {/* Exchange */}
-          <div className="mt-1">
+          <div className="space-y-2">
             <GroupRow
               label="Exchange"
               icon={FiDollarSign}
@@ -268,13 +259,14 @@ export default function Sidebar() {
                   : "max-h-0 opacity-0 -translate-y-1"
               }`}
             >
-              <BulletLink href="/main/exchange/trade">Trade</BulletLink>
-              <BulletLink href="/main/exchange/swap">Swap</BulletLink>
+              <div className="space-y-2">
+                <BulletLink href="/main/exchange/trade">Trade</BulletLink>
+                <BulletLink href="/main/exchange/swap">Swap</BulletLink>
+              </div>
             </div>
           </div>
 
-          {/* Stake */}
-          <div className="mt-1">
+          <div className="space-y-2">
             <GroupRow
               label="Stake"
               icon={BsFillRocketTakeoffFill}
@@ -288,8 +280,10 @@ export default function Sidebar() {
                   : "max-h-0 opacity-0 -translate-y-1"
               }`}
             >
-              <BulletLink href="/main/stake/plans">Plans</BulletLink>
-              <BulletLink href="/main/stake/manage">Manage</BulletLink>
+              <div className="space-y-2">
+                <BulletLink href="/main/stake/plans">Plans</BulletLink>
+                <BulletLink href="/main/stake/manage">Manage</BulletLink>
+              </div>
             </div>
           </div>
         </div>
