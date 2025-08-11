@@ -28,12 +28,12 @@ export default function CommerceTransactions() {
 
         <div className="bg-[#1f2937] rounded-xl shadow-md overflow-hidden">
           {/* Tabs */}
-          <div className="flex items-center gap-4 px-4 pt-4">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 px-4 pt-4 overflow-x-auto">
             {tabs.map(({ key, count, color }) => (
               <button
                 key={key}
                 onClick={() => setTab(key)}
-                className={`relative pb-3 text-sm flex items-center gap-2 text-gray-200 hover:text-white`}
+                className="relative pb-3 text-sm flex items-center gap-2 text-gray-200 hover:text-white whitespace-nowrap"
               >
                 <span
                   className={`px-2 py-0.5 rounded-full text-[11px] ${color} text-white`}
@@ -53,8 +53,8 @@ export default function CommerceTransactions() {
           {/* Table */}
           <div className="px-4 pb-4">
             <div className="overflow-x-auto mt-2">
-              <table className="w-full text-sm">
-                <thead className="text-gray-400">
+              <table className="w-full min-w-[700px] text-sm">
+                <thead className="text-gray-400 sticky top-0 bg-[#1f2937] z-10">
                   <tr className="border-b border-white/10">
                     <th className="py-3 text-left">Coin</th>
                     <th className="py-3 text-left">Customer</th>

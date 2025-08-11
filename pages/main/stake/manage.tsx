@@ -1,3 +1,4 @@
+// pages/main/stake/manage.tsx
 import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import TableShell from "@/components/peer/TableShell";
@@ -8,8 +9,8 @@ type Row = {
   yield: string;
   period: string;
   apr: string;
-  subscription: string; // date
-  redemption: string; // date or '-'
+  subscription: string;
+  redemption: string;
   status: "Holding" | "Redeemed" | "Pending";
 };
 
@@ -78,10 +79,10 @@ export default function StakeManagePage() {
     []
   );
 
-  const filtered = useMemo(() => {
-    if (tab === "All") return rows;
-    return rows.filter((r) => r.status === tab);
-  }, [rows, tab]);
+  const filtered = useMemo(
+    () => (tab === "All" ? rows : rows.filter((r) => r.status === tab)),
+    [rows, tab]
+  );
 
   const counts = useMemo(
     () => ({
@@ -92,6 +93,18 @@ export default function StakeManagePage() {
     }),
     [rows]
   );
+
+  // Build mobile cards from table data (labels must match `head`)
+  const mobileRows = filtered.map((r) => ({
+    Coin: r.coin,
+    Amount: r.amount,
+    Yield: r.yield,
+    Period: r.period,
+    "Est. APR": r.apr,
+    Subscription: r.subscription,
+    Redemption: r.redemption,
+    Status: r.status,
+  }));
 
   return (
     <DashboardLayout>
@@ -105,8 +118,8 @@ export default function StakeManagePage() {
         </div>
 
         {/* Tabs + mock switch */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
             {(["All", "Holding", "Redeemed", "Pending"] as const).map((t) => (
               <button
                 key={t}
@@ -152,11 +165,11 @@ export default function StakeManagePage() {
           </label>
         </div>
 
-        {/* Table */}
+        {/* Table (desktop) + Cards (mobile) */}
         {filtered.length === 0 ? (
-          <TableShell head={head} rowsLabel="No rows" />
+          <TableShell head={head} rowsLabel="No rows" mobileRows={[]} />
         ) : (
-          <TableShell head={head}>
+          <TableShell head={head} mobileRows={mobileRows}>
             {filtered.map((r, i) => (
               <tr key={i} className="border-t border-white/10">
                 <td className="py-2 px-4">{r.coin}</td>

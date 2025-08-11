@@ -34,12 +34,12 @@ export default function SlideCaptchaModal({
   return (
     <div className="fixed inset-0 z-[1000] grid place-items-center bg-black/60">
       <div className="w-[560px] max-w-[92vw] rounded-xl bg-[#111827] text-white shadow-2xl border border-white/10">
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+        <div className="px-5 py-4 mb-3 border-b border-white/10 flex items-center justify-between">
           <h3 className="text-[15px] font-semibold">Slide to verify</h3>
           <button
             ref={closeRef}
             onClick={onClose}
-            className="text-white/60 hover:text-white"
+            className="text-white hover:text-white"
             aria-label="Close"
           >
             ✕

@@ -1,4 +1,3 @@
-// pages/auth/forgot-password.tsx
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -12,14 +11,11 @@ export default function ForgotPasswordPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Simulate sending reset code
     console.log("Send reset code to:", email);
 
-    // ✅ Store email in localStorage
     localStorage.setItem("email", email);
 
-    // ✅ Navigate to next step (verify-code or reset-password)
-    router.push("/auth/verify-code"); // or "/auth/reset-password"
+    router.push("/auth/verify-code");
   };
 
   return (

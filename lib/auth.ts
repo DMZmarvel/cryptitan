@@ -1,4 +1,3 @@
-// lib/auth.ts
 export type StoredUser = {
   username: string;
   email: string;
@@ -12,7 +11,7 @@ const VERIFIED_KEY = "ct_verified";
 export function saveUser(user: StoredUser) {
   try {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
-    // let listeners re-read user after register/login
+
     window.dispatchEvent(new Event("ct:user-updated"));
   } catch {}
 }
